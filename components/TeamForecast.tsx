@@ -78,7 +78,7 @@ function OtherCard({ profile, detail }: { profile: Profile; detail: CompatDetail
 
 export function TeamForecast({ center, centerSelfScore, others }: Props) {
   return (
-    <aside className="w-[360px] shrink-0 p-6 border-l border-black/8 bg-paper">
+    <aside className="w-full md:w-[360px] shrink-0 px-4 py-5 md:p-6 border-t md:border-t-0 md:border-l border-black/8 bg-paper">
       <div className="editorial-label mb-4">Team Forecast</div>
       <CenterCard profile={center} score={centerSelfScore} />
       <div className="mt-5 space-y-4">

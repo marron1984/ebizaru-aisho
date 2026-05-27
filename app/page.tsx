@@ -48,8 +48,8 @@ export default function Home() {
         }
       />
       <EditorialBand date={date} />
-      <div className="flex flex-1">
-        <section className="flex-1 min-w-0">
+      <div className="flex flex-col md:flex-row flex-1">
+        <section className="flex-1 min-w-0 order-1">
           <RelationshipMap
             center={center}
             others={others}

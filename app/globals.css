@@ -29,3 +29,17 @@ body {
   font-size: 11px;
   color: #6b6b66;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  html, body {
+    overflow-x: hidden;
+  }
+}

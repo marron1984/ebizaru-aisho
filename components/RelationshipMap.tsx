@@ -38,35 +38,38 @@ export function RelationshipMap({ center, others, centerSelf, onSelectViewpoint 
   }, [center, others, cx, cy]);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center gap-4 mb-6">
+    <div className="p-4 md:p-8">
+      <div className="flex items-center gap-4 mb-3 md:mb-6">
         <span className="editorial-label">Relationship Map</span>
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap mb-8">
-        <span className="editorial-label">Viewpoint 視点</span>
-        <button
-          onClick={() => onSelectViewpoint?.(center.person.id)}
-          className="flex items-center gap-2 pl-2 pr-3 py-1 border-2 border-ink rounded-full text-[13px] bg-paper shadow-[0_0_0_2px_rgba(180,160,100,0.35)]"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-sand-400" />
-          <span className="kanji font-medium">{center.person.fullName}</span>
-          <span className="editorial-label !text-[10px] ml-1">CENTER</span>
-          <span className="num text-sage-700 font-semibold">{centerSelf}</span>
-        </button>
-        {others.map((p) => {
-          const c = calcCompat(center, p);
-          return (
-            <button
-              key={p.person.id}
-              onClick={() => onSelectViewpoint?.(p.person.id)}
-              className="flex items-center gap-2 pl-2 pr-3 py-1 border border-neutral-300 rounded-full text-[13px] bg-white hover:bg-neutral-50 transition-colors"
-            >
-              <span className="kanji">{p.person.fullName}</span>
-              <span className="num text-neutral-500">{c.overall}</span>
-            </button>
-          );
-        })}
+      <div className="mb-5 md:mb-8 -mx-4 md:mx-0 px-4 md:px-0">
+        <div className="md:hidden editorial-label mb-2">Viewpoint 視点</div>
+        <div className="flex items-center gap-2 md:gap-3 md:flex-wrap overflow-x-auto md:overflow-visible no-scrollbar pb-1">
+          <span className="hidden md:inline editorial-label">Viewpoint 視点</span>
+          <button
+            onClick={() => onSelectViewpoint?.(center.person.id)}
+            className="flex items-center gap-2 pl-2 pr-3 py-1.5 border-2 border-ink rounded-full text-[13px] bg-paper shadow-[0_0_0_2px_rgba(180,160,100,0.35)] shrink-0"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-sand-400" />
+            <span className="kanji font-medium">{center.person.fullName}</span>
+            <span className="editorial-label !text-[10px] ml-1">CENTER</span>
+            <span className="num text-sage-700 font-semibold">{centerSelf}</span>
+          </button>
+          {others.map((p) => {
+            const c = calcCompat(center, p);
+            return (
+              <button
+                key={p.person.id}
+                onClick={() => onSelectViewpoint?.(p.person.id)}
+                className="flex items-center gap-2 pl-2 pr-3 py-1.5 border border-neutral-300 rounded-full text-[13px] bg-white hover:bg-neutral-50 transition-colors shrink-0"
+              >
+                <span className="kanji">{p.person.fullName}</span>
+                <span className="num text-neutral-500">{c.overall}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[720px] mx-auto block">

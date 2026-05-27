@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   description: "相性・チームの占断マップ",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">

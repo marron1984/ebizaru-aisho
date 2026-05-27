@@ -26,14 +26,16 @@ export function EditorialBand({ date }: Props) {
   const nd = `${st.nextDate.getMonth() + 1}/${st.nextDate.getDate()}`;
 
   return (
-    <div className="px-8 py-3 border-b border-black/8 flex items-center gap-6 text-[11px] text-neutral-600 bg-paper">
-      <span className="editorial-label">Astronomy</span>
-      <span className="kanji">太陽黄経 <span className="num text-neutral-800">{fmt(sl)}</span></span>
-      <span className="kanji">月黄経 <span className="num text-neutral-800">{fmt(ml)}</span></span>
-      <span className="kanji">月齢 <span className="num text-neutral-800">{mp.age.toFixed(1)}</span></span>
-      <span className="kanji">{mp.name}</span>
-      <span className="text-neutral-300">/</span>
-      <span className="kanji">節気 <span className="text-neutral-800">{st.current.name}</span> → <span className="text-neutral-800">{st.next.name}</span> <span className="num text-neutral-500">{nd}</span></span>
+    <div className="px-4 md:px-8 py-2.5 border-b border-black/8 bg-paper">
+      <div className="flex items-center gap-4 md:gap-6 text-[11px] text-neutral-600 overflow-x-auto no-scrollbar">
+        <span className="editorial-label shrink-0">Astronomy</span>
+        <span className="kanji shrink-0">太陽黄経 <span className="num text-neutral-800">{fmt(sl)}</span></span>
+        <span className="kanji shrink-0">月黄経 <span className="num text-neutral-800">{fmt(ml)}</span></span>
+        <span className="kanji shrink-0">月齢 <span className="num text-neutral-800">{mp.age.toFixed(1)}</span></span>
+        <span className="kanji shrink-0">{mp.name}</span>
+        <span className="text-neutral-300 shrink-0">/</span>
+        <span className="kanji shrink-0">節気 <span className="text-neutral-800">{st.current.name}</span> → <span className="text-neutral-800">{st.next.name}</span> <span className="num text-neutral-500">{nd}</span></span>
+      </div>
     </div>
   );
 }

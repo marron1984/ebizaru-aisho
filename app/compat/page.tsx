@@ -45,33 +45,35 @@ function RosterPicker({
   onCustom: () => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
-      <span className="editorial-label !text-[10px] self-center mr-1">Roster {side}</span>
-      {ROSTER.map((p) => {
-        const selected = value === p.id;
-        return (
-          <button
-            key={p.id}
-            onClick={() => onPick(p)}
-            className={[
-              "px-2 py-0.5 rounded-full text-[11px] kanji border transition-colors",
-              selected ? "bg-ink text-paper border-ink" : "border-neutral-300 text-neutral-700 bg-white hover:bg-neutral-100",
-            ].join(" ")}
-            title={p.birth}
-          >
-            {p.fullName}
-          </button>
-        );
-      })}
-      <button
-        onClick={onCustom}
-        className={[
-          "px-2 py-0.5 rounded-full text-[11px] kanji border transition-colors",
-          value === "custom" ? "bg-sand-100 border-sand-300 text-sand-500" : "border-neutral-300 text-neutral-500 bg-white hover:bg-neutral-100",
-        ].join(" ")}
-      >
-        カスタム入力
-      </button>
+    <div>
+      <div className="editorial-label !text-[10px] mb-1.5">Roster {side}</div>
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
+        {ROSTER.map((p) => {
+          const selected = value === p.id;
+          return (
+            <button
+              key={p.id}
+              onClick={() => onPick(p)}
+              className={[
+                "px-2.5 py-1 rounded-full text-[11px] kanji border transition-colors shrink-0",
+                selected ? "bg-ink text-paper border-ink" : "border-neutral-300 text-neutral-700 bg-white",
+              ].join(" ")}
+              title={p.birth}
+            >
+              {p.fullName}
+            </button>
+          );
+        })}
+        <button
+          onClick={onCustom}
+          className={[
+            "px-2.5 py-1 rounded-full text-[11px] kanji border transition-colors shrink-0",
+            value === "custom" ? "bg-sand-100 border-sand-300 text-sand-500" : "border-neutral-300 text-neutral-500 bg-white",
+          ].join(" ")}
+        >
+          カスタム入力
+        </button>
+      </div>
     </div>
   );
 }
@@ -110,7 +112,7 @@ function Form({
           value={v.fullName}
           onChange={(e) => customize({ fullName: e.target.value })}
           placeholder="例: 山田 太郎"
-          className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] kanji"
+          className="w-full mt-1 px-2 py-2 border border-neutral-300 rounded text-[16px] kanji"
         />
       </div>
       <div>
@@ -119,7 +121,7 @@ function Form({
           type="date"
           value={v.birth}
           onChange={(e) => customize({ birth: e.target.value })}
-          className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] num"
+          className="w-full mt-1 px-2 py-2 border border-neutral-300 rounded text-[16px] num"
         />
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -128,7 +130,7 @@ function Form({
           <select
             value={v.gender}
             onChange={(e) => customize({ gender: e.target.value as Gender })}
-            className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] kanji bg-white"
+            className="w-full mt-1 px-2 py-2 border border-neutral-300 rounded text-[16px] kanji bg-white"
           >
             <option value="male">男性</option>
             <option value="female">女性</option>
@@ -140,7 +142,7 @@ function Form({
           <select
             value={v.mbti}
             onChange={(e) => customize({ mbti: e.target.value as MbtiType | "" })}
-            className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] num bg-white"
+            className="w-full mt-1 px-2 py-2 border border-neutral-300 rounded text-[16px] num bg-white"
           >
             <option value="">—</option>
             {MBTI_TYPES.map((t) => (
@@ -350,22 +352,22 @@ export default function CompatPage() {
       />
       <EditorialBand date={date} />
 
-      <div className="p-8 grid grid-cols-12 gap-6">
-        <div className="col-span-3 space-y-4">
+      <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+        <div className="lg:col-span-3 space-y-4 grid grid-cols-1 md:grid-cols-2 lg:block lg:space-y-4 gap-4">
           <Form side="A" v={a} onChange={setA} />
           <Form side="B" v={b} onChange={setB} />
         </div>
 
-        <div className="col-span-9 space-y-6">
+        <div className="lg:col-span-9 space-y-4 md:space-y-6">
           {!result ? (
             <div className="text-neutral-500 kanji p-8 border border-dashed border-neutral-300 rounded">
               名前と生年月日を入力すると相性が表示されます。
             </div>
           ) : (
             <>
-              <section className="bg-white border border-neutral-200 rounded-md p-6">
-                <div className="editorial-label mb-4">Compatibility</div>
-                <div className="grid grid-cols-3 gap-6">
+              <section className="bg-white border border-neutral-200 rounded-md p-4 md:p-6">
+                <div className="editorial-label mb-3 md:mb-4">Compatibility</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   <ScorePanel title={`${result.pa.person.fullName} → ${result.pb.person.fullName}`} d={result.ab} />
                   <ScorePanel title={`${result.pb.person.fullName} → ${result.pa.person.fullName}`} d={result.ba} />
                   <div>
@@ -383,7 +385,7 @@ export default function CompatPage() {
                 </div>
               </section>
 
-              <section className="grid grid-cols-2 gap-6">
+              <section className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
                 <CommentaryView
                   title={`${result.pa.person.fullName} → ${result.pb.person.fullName}`}
                   c={result.cab}
@@ -394,7 +396,7 @@ export default function CompatPage() {
                 />
               </section>
 
-              <section className="grid grid-cols-2 gap-6">
+              <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <ProfileCard label="A" p={result.pa} />
                 <ProfileCard label="B" p={result.pb} />
               </section>
