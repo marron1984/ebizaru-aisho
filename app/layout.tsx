@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "URANAI — 私的占断",
+  title: "NOSE URANAI — 私的占断",
   description: "相性・チームの占断マップ",
 };
 

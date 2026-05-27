@@ -30,7 +30,7 @@ export function Header({ date, onDateChange, rightSlot }: Props) {
       {/* 上段: ロゴ + 日付 + 月相 + 節気 + rightSlot */}
       <div className="flex items-center gap-3 px-4 md:px-8 py-3 md:py-5 flex-wrap md:flex-nowrap">
         <div className="flex items-baseline gap-2 md:gap-3 shrink-0">
-          <span className="kanji text-[18px] md:text-[22px] font-semibold tracking-[0.22em] md:tracking-[0.28em]">URANAI</span>
+          <span className="kanji text-[18px] md:text-[22px] font-semibold tracking-[0.22em] md:tracking-[0.28em]">NOSE URANAI</span>
           <span className="hidden sm:inline text-[11px] text-neutral-500 tracking-[0.2em] kanji">私的占断 / N°382</span>
         </div>
 
