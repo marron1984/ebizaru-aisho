@@ -10,5 +10,17 @@ const c = buildCommentary(a, b, d);
 console.log("HEAD:", c.headline);
 console.log("");
 for (const p of c.paragraphs) console.log("●", p.title, "\n  ", p.body, "\n");
+console.log("=== SYNTHESIS ===");
+for (const p of c.synthesis) console.log("✦", p.title, "\n  ", p.body, "\n");
+console.log("=== AXES ===");
 for (const ax of c.axes) console.log("[", ax.label, ax.score, "]", ax.note);
 console.log("\nCLOSE:", c.closing);
+
+console.log("\n\n=== Different pair: 吉田 → 高家 陸斗 (low score case) ===");
+const b2 = buildProfile(TEAM[7]);
+const d2 = calcCompat(a, b2);
+const c2 = buildCommentary(a, b2, d2);
+console.log("HEAD:", c2.headline);
+console.log("");
+console.log("✦", c2.synthesis.map(s => s.title).join(" / "));
+console.log("CLOSE:", c2.closing);

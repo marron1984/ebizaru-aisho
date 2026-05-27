@@ -211,6 +211,18 @@ function CommentaryView({ title, c }: { title: string; c: Commentary }) {
         ))}
       </div>
 
+      {c.synthesis.length > 0 && (
+        <div className="border-t border-neutral-200 pt-3 space-y-3">
+          <div className="editorial-label">Synthesis 深層</div>
+          {c.synthesis.map((p) => (
+            <div key={p.title} className="bg-sage-50/60 border-l-2 border-sage-500 pl-3 py-1.5">
+              <div className="text-[11px] kanji text-sage-700 mb-1">{p.title}</div>
+              <p className="kanji text-[13px] leading-relaxed text-neutral-700">{p.body}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="border-t border-neutral-200 pt-3">
         <div className="editorial-label mb-2">4 軸別の所感</div>
         <ul className="space-y-1.5">
