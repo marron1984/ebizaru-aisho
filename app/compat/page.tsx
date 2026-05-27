@@ -4,17 +4,76 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { EditorialBand } from "@/components/EditorialBand";
-import { buildProfile } from "@/lib/profile";
-import { calcCompat } from "@/lib/compat";
+import { OWNER } from "@/lib/owner";
+import { TEAM } from "@/lib/team";
+import { buildProfile, type Profile } from "@/lib/profile";
+import { calcCompat, type CompatDetail } from "@/lib/compat";
+import { buildCommentary, type Commentary } from "@/lib/commentary";
 import { MBTI_TYPES, type MbtiType } from "@/lib/mbti";
 import { RATING_DESC, dirRatings, DIRECTIONS } from "@/lib/fengshui";
-import type { Gender } from "@/lib/types";
+import type { Gender, Person } from "@/lib/types";
 
 interface PersonInput {
+  sourceId: string | "custom";
   fullName: string;
   birth: string;
   gender: Gender;
   mbti: MbtiType | "";
+}
+
+const ROSTER: Person[] = [OWNER, ...TEAM];
+
+function inputFromPerson(p: Person): PersonInput {
+  return {
+    sourceId: p.id,
+    fullName: p.fullName,
+    birth: p.birth,
+    gender: p.gender ?? "male",
+    mbti: p.mbti ?? "",
+  };
+}
+
+function RosterPicker({
+  side,
+  value,
+  onPick,
+  onCustom,
+}: {
+  side: "A" | "B";
+  value: string;
+  onPick: (p: Person) => void;
+  onCustom: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      <span className="editorial-label !text-[10px] self-center mr-1">Roster {side}</span>
+      {ROSTER.map((p) => {
+        const selected = value === p.id;
+        return (
+          <button
+            key={p.id}
+            onClick={() => onPick(p)}
+            className={[
+              "px-2 py-0.5 rounded-full text-[11px] kanji border transition-colors",
+              selected ? "bg-ink text-paper border-ink" : "border-neutral-300 text-neutral-700 bg-white hover:bg-neutral-100",
+            ].join(" ")}
+            title={p.birth}
+          >
+            {p.fullName}
+          </button>
+        );
+      })}
+      <button
+        onClick={onCustom}
+        className={[
+          "px-2 py-0.5 rounded-full text-[11px] kanji border transition-colors",
+          value === "custom" ? "bg-sand-100 border-sand-300 text-sand-500" : "border-neutral-300 text-neutral-500 bg-white hover:bg-neutral-100",
+        ].join(" ")}
+      >
+        カスタム入力
+      </button>
+    </div>
+  );
 }
 
 function Form({
@@ -26,17 +85,30 @@ function Form({
   v: PersonInput;
   onChange: (next: PersonInput) => void;
 }) {
+  const customize = (patch: Partial<PersonInput>) =>
+    onChange({ ...v, ...patch, sourceId: "custom" });
+
   return (
     <div className="bg-white border border-neutral-200 rounded-md p-5 space-y-3">
       <div className="flex items-baseline justify-between">
         <span className="editorial-label">Person {side}</span>
-        <span className="kanji text-[12px] text-neutral-400">入力</span>
+        <span className="kanji text-[12px] text-neutral-400">
+          {v.sourceId === "custom" ? "カスタム入力" : "メンバー選択中"}
+        </span>
       </div>
+
+      <RosterPicker
+        side={side}
+        value={v.sourceId}
+        onPick={(p) => onChange(inputFromPerson(p))}
+        onCustom={() => onChange({ ...v, sourceId: "custom" })}
+      />
+
       <div>
         <label className="editorial-label !text-[10px]">Full Name 姓名</label>
         <input
           value={v.fullName}
-          onChange={(e) => onChange({ ...v, fullName: e.target.value })}
+          onChange={(e) => customize({ fullName: e.target.value })}
           placeholder="例: 山田 太郎"
           className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] kanji"
         />
@@ -46,7 +118,7 @@ function Form({
         <input
           type="date"
           value={v.birth}
-          onChange={(e) => onChange({ ...v, birth: e.target.value })}
+          onChange={(e) => customize({ birth: e.target.value })}
           className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] num"
         />
       </div>
@@ -55,7 +127,7 @@ function Form({
           <label className="editorial-label !text-[10px]">Gender 性別</label>
           <select
             value={v.gender}
-            onChange={(e) => onChange({ ...v, gender: e.target.value as Gender })}
+            onChange={(e) => customize({ gender: e.target.value as Gender })}
             className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] kanji bg-white"
           >
             <option value="male">男性</option>
@@ -67,7 +139,7 @@ function Form({
           <label className="editorial-label !text-[10px]">MBTI</label>
           <select
             value={v.mbti}
-            onChange={(e) => onChange({ ...v, mbti: e.target.value as MbtiType | "" })}
+            onChange={(e) => customize({ mbti: e.target.value as MbtiType | "" })}
             className="w-full mt-1 px-2 py-1.5 border border-neutral-300 rounded text-[14px] num bg-white"
           >
             <option value="">—</option>
@@ -93,84 +165,7 @@ function StatRow({ label, value, hint }: { label: string; value: number | string
   );
 }
 
-export default function CompatPage() {
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [a, setA] = useState<PersonInput>({ fullName: "吉田 駿成", birth: "1984-05-02", gender: "male", mbti: "INFJ" });
-  const [b, setB] = useState<PersonInput>({ fullName: "力久 凌太郎", birth: "1998-07-08", gender: "male", mbti: "" });
-
-  const ready = a.fullName.trim() && a.birth && b.fullName.trim() && b.birth;
-
-  const result = useMemo(() => {
-    if (!ready) return null;
-    const pa = buildProfile({ id: "A", fullName: a.fullName, birth: a.birth, gender: a.gender, mbti: a.mbti || undefined });
-    const pb = buildProfile({ id: "B", fullName: b.fullName, birth: b.birth, gender: b.gender, mbti: b.mbti || undefined });
-    const ab = calcCompat(pa, pb);
-    const ba = calcCompat(pb, pa);
-    return { pa, pb, ab, ba };
-  }, [a, b, ready]);
-
-  return (
-    <main className="min-h-screen flex flex-col">
-      <Header
-        date={date}
-        onDateChange={setDate}
-        rightSlot={
-          <Link
-            href="/"
-            className="px-3 py-1.5 border border-neutral-300 rounded-full text-[12px] kanji bg-white hover:bg-neutral-50"
-          >
-            ← チームモード
-          </Link>
-        }
-      />
-      <EditorialBand date={date} />
-
-      <div className="p-8 grid grid-cols-12 gap-6">
-        <div className="col-span-3 space-y-4">
-          <Form side="A" v={a} onChange={setA} />
-          <Form side="B" v={b} onChange={setB} />
-        </div>
-
-        <div className="col-span-9 space-y-6">
-          {!result ? (
-            <div className="text-neutral-500 kanji p-8 border border-dashed border-neutral-300 rounded">
-              名前と生年月日を入力すると相性が表示されます。
-            </div>
-          ) : (
-            <>
-              <section className="bg-white border border-neutral-200 rounded-md p-6">
-                <div className="editorial-label mb-4">Compatibility</div>
-                <div className="grid grid-cols-3 gap-6">
-                  <ScorePanel title={`${result.pa.person.fullName} → ${result.pb.person.fullName}`} d={result.ab} />
-                  <ScorePanel title={`${result.pb.person.fullName} → ${result.pa.person.fullName}`} d={result.ba} />
-                  <div>
-                    <div className="editorial-label mb-2">Synthesis</div>
-                    <StatRow label="九星関係"   value={result.ab.starKind} />
-                    <StatRow label="通変星"     value={result.ab.tongbian} />
-                    <StatRow label="地支関係"   value={result.ab.branchRelation} />
-                    <StatRow label="星座"       value={result.ab.zodiac} />
-                    <StatRow label="姓名 合成"  value={result.ab.seimei} />
-                    <StatRow label="風水 卦"    value={result.ab.kua} />
-                    {result.ab.mbti && (
-                      <StatRow label="MBTI"     value={result.ab.mbti.score} hint={result.ab.mbti.label} />
-                    )}
-                  </div>
-                </div>
-              </section>
-
-              <section className="grid grid-cols-2 gap-6">
-                <ProfileCard label="A" p={result.pa} />
-                <ProfileCard label="B" p={result.pb} />
-              </section>
-            </>
-          )}
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function ScorePanel({ title, d }: { title: string; d: import("@/lib/compat").CompatDetail }) {
+function ScorePanel({ title, d }: { title: string; d: CompatDetail }) {
   return (
     <div>
       <div className="text-[11px] text-neutral-500 kanji mb-2 truncate">{title}</div>
@@ -198,7 +193,45 @@ function ScorePanel({ title, d }: { title: string; d: import("@/lib/compat").Com
   );
 }
 
-function ProfileCard({ label, p }: { label: string; p: import("@/lib/profile").Profile }) {
+function CommentaryView({ title, c }: { title: string; c: Commentary }) {
+  return (
+    <article className="bg-white border border-neutral-200 rounded-md p-6 space-y-4">
+      <header className="flex items-baseline justify-between">
+        <span className="editorial-label">Commentary</span>
+        <span className="text-[11px] kanji text-neutral-500">{title}</span>
+      </header>
+      <p className="kanji text-[14px] leading-relaxed text-neutral-800">{c.headline}</p>
+
+      <div className="space-y-3">
+        {c.paragraphs.map((p) => (
+          <div key={p.title}>
+            <div className="text-[11px] kanji text-sage-700 mb-1">{p.title}</div>
+            <p className="kanji text-[13px] leading-relaxed text-neutral-700">{p.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t border-neutral-200 pt-3">
+        <div className="editorial-label mb-2">4 軸別の所感</div>
+        <ul className="space-y-1.5">
+          {c.axes.map((a) => (
+            <li key={a.label} className="flex items-start gap-3 text-[13px]">
+              <span className="w-10 kanji text-neutral-500 shrink-0">{a.label}</span>
+              <span className="num w-8 shrink-0 text-sage-700">{a.score}</span>
+              <span className="kanji text-neutral-700 leading-relaxed">{a.note}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p className="kanji text-[13px] leading-relaxed text-neutral-700 italic border-l-2 border-sand-300 pl-3">
+        {c.closing}
+      </p>
+    </article>
+  );
+}
+
+function ProfileCard({ label, p }: { label: string; p: Profile }) {
   const dirs = dirRatings(p.kua);
   return (
     <div className="bg-white border border-neutral-200 rounded-md p-5">
@@ -256,5 +289,107 @@ function ProfileCard({ label, p }: { label: string; p: import("@/lib/profile").P
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CompatPage() {
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [a, setA] = useState<PersonInput>(() => inputFromPerson(OWNER));
+  const [b, setB] = useState<PersonInput>(() => inputFromPerson(TEAM[5])); // 力久 凌太郎
+
+  const ready = a.fullName.trim() && a.birth && b.fullName.trim() && b.birth;
+
+  const result = useMemo(() => {
+    if (!ready) return null;
+    const pa = buildProfile({
+      id: a.sourceId === "custom" ? "A" : a.sourceId,
+      fullName: a.fullName,
+      birth: a.birth,
+      gender: a.gender,
+      mbti: a.mbti || undefined,
+    });
+    const pb = buildProfile({
+      id: b.sourceId === "custom" ? "B" : b.sourceId,
+      fullName: b.fullName,
+      birth: b.birth,
+      gender: b.gender,
+      mbti: b.mbti || undefined,
+    });
+    const ab = calcCompat(pa, pb);
+    const ba = calcCompat(pb, pa);
+    const cab = buildCommentary(pa, pb, ab);
+    const cba = buildCommentary(pb, pa, ba);
+    return { pa, pb, ab, ba, cab, cba };
+  }, [a, b, ready]);
+
+  return (
+    <main className="min-h-screen flex flex-col">
+      <Header
+        date={date}
+        onDateChange={setDate}
+        rightSlot={
+          <Link
+            href="/"
+            className="px-3 py-1.5 border border-neutral-300 rounded-full text-[12px] kanji bg-white hover:bg-neutral-50"
+          >
+            ← チームモード
+          </Link>
+        }
+      />
+      <EditorialBand date={date} />
+
+      <div className="p-8 grid grid-cols-12 gap-6">
+        <div className="col-span-3 space-y-4">
+          <Form side="A" v={a} onChange={setA} />
+          <Form side="B" v={b} onChange={setB} />
+        </div>
+
+        <div className="col-span-9 space-y-6">
+          {!result ? (
+            <div className="text-neutral-500 kanji p-8 border border-dashed border-neutral-300 rounded">
+              名前と生年月日を入力すると相性が表示されます。
+            </div>
+          ) : (
+            <>
+              <section className="bg-white border border-neutral-200 rounded-md p-6">
+                <div className="editorial-label mb-4">Compatibility</div>
+                <div className="grid grid-cols-3 gap-6">
+                  <ScorePanel title={`${result.pa.person.fullName} → ${result.pb.person.fullName}`} d={result.ab} />
+                  <ScorePanel title={`${result.pb.person.fullName} → ${result.pa.person.fullName}`} d={result.ba} />
+                  <div>
+                    <div className="editorial-label mb-2">Synthesis</div>
+                    <StatRow label="九星関係"   value={result.ab.starKind} />
+                    <StatRow label="通変星"     value={result.ab.tongbian} />
+                    <StatRow label="地支関係"   value={result.ab.branchRelation} />
+                    <StatRow label="星座"       value={result.ab.zodiac} />
+                    <StatRow label="姓名 合成"  value={result.ab.seimei} />
+                    <StatRow label="風水 卦"    value={result.ab.kua} />
+                    {result.ab.mbti && (
+                      <StatRow label="MBTI"     value={result.ab.mbti.score} hint={result.ab.mbti.label} />
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid grid-cols-2 gap-6">
+                <CommentaryView
+                  title={`${result.pa.person.fullName} → ${result.pb.person.fullName}`}
+                  c={result.cab}
+                />
+                <CommentaryView
+                  title={`${result.pb.person.fullName} → ${result.pa.person.fullName}`}
+                  c={result.cba}
+                />
+              </section>
+
+              <section className="grid grid-cols-2 gap-6">
+                <ProfileCard label="A" p={result.pa} />
+                <ProfileCard label="B" p={result.pb} />
+              </section>
+            </>
+          )}
+        </div>
+      </div>
+    </main>
   );
 }
