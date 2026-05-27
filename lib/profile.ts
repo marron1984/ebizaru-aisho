@@ -2,6 +2,7 @@ import { dayPillar, yearPillar, type Stem, type Branch } from "./shichu";
 import { honmeiStar, KYUSEI_NAMES } from "./kyusei";
 import { getSunSign, zodiacJa } from "./astrology";
 import { lifePathNumber } from "./numerology";
+import { kakusuFromFullName, judgeKakusu, kakusuScore, type KakusuJudgment } from "./seimei";
 import type { Person, Zodiac } from "./types";
 
 export interface Profile {
@@ -17,6 +18,8 @@ export interface Profile {
   yearStem: Stem;
   yearBranch: Branch;
   lifePath: number;
+  kakusu: KakusuJudgment;
+  kakusuScore: number;
 }
 
 export function buildProfile(person: Person): Profile {
@@ -25,6 +28,7 @@ export function buildProfile(person: Person): Profile {
   const honmei = honmeiStar(y, m, d);
   const dp = dayPillar(y, m, d);
   const yp = yearPillar(y, m, d);
+  const k = judgeKakusu(kakusuFromFullName(person.fullName));
   return {
     person,
     birth: { y, m, d },
@@ -38,5 +42,7 @@ export function buildProfile(person: Person): Profile {
     yearStem: yp.stem,
     yearBranch: yp.branch,
     lifePath: lifePathNumber(person.birth),
+    kakusu: k,
+    kakusuScore: kakusuScore(k),
   };
 }

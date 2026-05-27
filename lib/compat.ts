@@ -3,6 +3,7 @@ import { starRelation } from "./kyusei";
 import { zodiacCompatScore } from "./astrology";
 import { lifePathCompat } from "./numerology";
 import { tongbianStar, branchInteraction, branchScore, TONGBIAN_SCORE } from "./shichu";
+import { seimeiCompat } from "./seimei";
 
 export interface CompatBreakdown {
   work: number;       // 仕事
@@ -17,6 +18,7 @@ export interface CompatDetail extends CompatBreakdown {
   tongbian: string;
   branchRelation: string;
   zodiac: string;
+  seimei: number;
 }
 
 function clamp(n: number, lo = 1, hi = 99): number {
@@ -44,10 +46,13 @@ export function calcCompat(a: Profile, b: Profile): CompatDetail {
   // ライフパス (社交/金運)
   const lpScore = (lifePathCompat(a.lifePath, b.lifePath) / 5) * 100;
 
-  const work    = clamp(tongScore * 0.55 + kyuseiScore * 0.25 + bScore * 0.20);
-  const social  = clamp(kyuseiScore * 0.45 + zScore * 0.30 + lpScore * 0.25);
-  const health  = clamp(zScore * 0.40 + bScore * 0.35 + kyuseiScore * 0.25);
-  const wealth  = clamp(tongScore * 0.45 + lpScore * 0.30 + kyuseiScore * 0.25);
+  // 姓名判断 (運勢全般の補強)
+  const seScore = seimeiCompat(a.kakusu, b.kakusu);
+
+  const work    = clamp(tongScore * 0.50 + kyuseiScore * 0.25 + bScore * 0.15 + seScore * 0.10);
+  const social  = clamp(kyuseiScore * 0.40 + zScore * 0.25 + lpScore * 0.20 + seScore * 0.15);
+  const health  = clamp(zScore * 0.40 + bScore * 0.30 + kyuseiScore * 0.20 + seScore * 0.10);
+  const wealth  = clamp(tongScore * 0.40 + lpScore * 0.25 + kyuseiScore * 0.20 + seScore * 0.15);
   const overall = clamp(work * 0.30 + social * 0.30 + wealth * 0.25 + health * 0.15);
 
   return {
@@ -56,6 +61,7 @@ export function calcCompat(a: Profile, b: Profile): CompatDetail {
     tongbian: tong,
     branchRelation: branchRel,
     zodiac: `${a.sunJa} × ${b.sunJa}`,
+    seimei: seScore,
   };
 }
 

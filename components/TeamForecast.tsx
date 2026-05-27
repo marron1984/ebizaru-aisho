@@ -22,6 +22,7 @@ function Bar({ label, value, color }: { label: string; value: number; color: str
 }
 
 function CenterCard({ profile, score }: { profile: Profile; score: CompatBreakdown }) {
+  const k = profile.kakusu;
   return (
     <div className="bg-ink text-paper px-4 py-3 rounded-md">
       <div className="flex items-baseline justify-between">
@@ -39,16 +40,14 @@ function CenterCard({ profile, score }: { profile: Profile; score: CompatBreakdo
         <Bar label="健康" value={score.health} color="#9fb27a" />
         <Bar label="金運" value={score.wealth} color="#9fb27a" />
       </div>
-      <div className="mt-3 text-[10px] text-neutral-400 kanji">
-        {profile.honmeiName} / {profile.dayGanzhi} ・ 今日「{centerTongbianHint(profile)}」
+      <div className="mt-3 text-[10px] text-neutral-400 kanji leading-relaxed">
+        {profile.honmeiName} / {profile.dayGanzhi} ・ {profile.sunJa}
+      </div>
+      <div className="text-[10px] text-neutral-500 kanji">
+        姓名 総格 <span className="num">{k.so}</span> {k.soJ} ・ 人格 <span className="num">{k.jin}</span> {k.jinJ}
       </div>
     </div>
   );
-}
-
-function centerTongbianHint(_p: Profile): string {
-  // 仮: 中央プロファイルの今日感を1語で
-  return "正財";
 }
 
 function OtherCard({ profile, detail }: { profile: Profile; detail: CompatDetail }) {
@@ -71,6 +70,7 @@ function OtherCard({ profile, detail }: { profile: Profile; detail: CompatDetail
       </div>
       <div className="mt-2 flex items-center justify-between text-[10px] kanji text-neutral-500">
         <span>{profile.honmeiName} / {profile.dayGanzhi} ・ 今日「{detail.tongbian}」</span>
+        <span>姓名 <span className="num">{profile.kakusu.so}</span> {profile.kakusu.soJ}</span>
       </div>
     </div>
   );

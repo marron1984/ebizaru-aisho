@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Header } from "@/components/Header";
+import { EditorialBand } from "@/components/EditorialBand";
 import { RelationshipMap } from "@/components/RelationshipMap";
 import { TeamForecast } from "@/components/TeamForecast";
 import { OWNER } from "@/lib/owner";
@@ -24,6 +25,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       <Header date={date} onDateChange={setDate} />
+      <EditorialBand date={date} />
       <div className="flex flex-1">
         <section className="flex-1 min-w-0">
           <RelationshipMap center={center} others={others} centerSelf={centerSelf.overall} />
