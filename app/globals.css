@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: theme("colors.paper");
+  color: theme("colors.ink");
+  font-feature-settings: "ss01", "tnum";
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-family: theme("fontFamily.mono");
+}
+
+.kanji {
+  font-family: theme("fontFamily.serif");
+}
+
+.editorial-label {
+  font-family: theme("fontFamily.sans");
+  letter-spacing: theme("letterSpacing.editorial");
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #6b6b66;
+}
