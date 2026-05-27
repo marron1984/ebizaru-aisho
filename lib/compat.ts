@@ -4,6 +4,8 @@ import { zodiacCompatScore } from "./astrology";
 import { lifePathCompat } from "./numerology";
 import { tongbianStar, branchInteraction, branchScore, TONGBIAN_SCORE } from "./shichu";
 import { seimeiCompat } from "./seimei";
+import { kuaCompat } from "./fengshui";
+import { mbtiCompat } from "./mbti";
 
 export interface CompatBreakdown {
   work: number;       // 仕事
@@ -19,6 +21,8 @@ export interface CompatDetail extends CompatBreakdown {
   branchRelation: string;
   zodiac: string;
   seimei: number;
+  kua: number;
+  mbti?: { label: string; score: number };
 }
 
 function clamp(n: number, lo = 1, hi = 99): number {
@@ -49,10 +53,17 @@ export function calcCompat(a: Profile, b: Profile): CompatDetail {
   // 姓名判断 (運勢全般の補強)
   const seScore = seimeiCompat(a.kakusu, b.kakusu);
 
-  const work    = clamp(tongScore * 0.50 + kyuseiScore * 0.25 + bScore * 0.15 + seScore * 0.10);
-  const social  = clamp(kyuseiScore * 0.40 + zScore * 0.25 + lpScore * 0.20 + seScore * 0.15);
-  const health  = clamp(zScore * 0.40 + bScore * 0.30 + kyuseiScore * 0.20 + seScore * 0.10);
-  const wealth  = clamp(tongScore * 0.40 + lpScore * 0.25 + kyuseiScore * 0.20 + seScore * 0.15);
+  // 風水 (本命卦群)
+  const fsScore = kuaCompat(a.kua, b.kua);
+
+  // MBTI (両方ある時のみ)
+  const mb = a.mbti && b.mbti ? mbtiCompat(a.mbti, b.mbti) : undefined;
+  const mbScore = mb?.score ?? 60;
+
+  const work    = clamp(tongScore * 0.42 + kyuseiScore * 0.22 + bScore * 0.12 + seScore * 0.10 + fsScore * 0.08 + mbScore * 0.06);
+  const social  = clamp(kyuseiScore * 0.32 + zScore * 0.20 + lpScore * 0.16 + seScore * 0.12 + fsScore * 0.08 + mbScore * 0.12);
+  const health  = clamp(zScore * 0.32 + bScore * 0.24 + kyuseiScore * 0.18 + seScore * 0.10 + fsScore * 0.10 + mbScore * 0.06);
+  const wealth  = clamp(tongScore * 0.32 + lpScore * 0.22 + kyuseiScore * 0.18 + seScore * 0.12 + fsScore * 0.10 + mbScore * 0.06);
   const overall = clamp(work * 0.30 + social * 0.30 + wealth * 0.25 + health * 0.15);
 
   return {
@@ -62,6 +73,8 @@ export function calcCompat(a: Profile, b: Profile): CompatDetail {
     branchRelation: branchRel,
     zodiac: `${a.sunJa} × ${b.sunJa}`,
     seimei: seScore,
+    kua: fsScore,
+    mbti: mb ? { label: mb.label, score: mb.score } : undefined,
   };
 }
 

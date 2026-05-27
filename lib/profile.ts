@@ -3,6 +3,8 @@ import { honmeiStar, KYUSEI_NAMES } from "./kyusei";
 import { getSunSign, zodiacJa } from "./astrology";
 import { lifePathNumber } from "./numerology";
 import { kakusuFromFullName, judgeKakusu, kakusuScore, type KakusuJudgment } from "./seimei";
+import { calcKua, kuaGroup, type Kua, type KuaGroup } from "./fengshui";
+import type { MbtiType } from "./mbti";
 import type { Person, Zodiac } from "./types";
 
 export interface Profile {
@@ -20,6 +22,9 @@ export interface Profile {
   lifePath: number;
   kakusu: KakusuJudgment;
   kakusuScore: number;
+  kua: Kua;
+  kuaGroup: KuaGroup;
+  mbti?: MbtiType;
 }
 
 export function buildProfile(person: Person): Profile {
@@ -29,6 +34,7 @@ export function buildProfile(person: Person): Profile {
   const dp = dayPillar(y, m, d);
   const yp = yearPillar(y, m, d);
   const k = judgeKakusu(kakusuFromFullName(person.fullName));
+  const kua = calcKua(y, m, d, person.gender ?? "male");
   return {
     person,
     birth: { y, m, d },
@@ -44,5 +50,8 @@ export function buildProfile(person: Person): Profile {
     lifePath: lifePathNumber(person.birth),
     kakusu: k,
     kakusuScore: kakusuScore(k),
+    kua,
+    kuaGroup: kuaGroup(kua),
+    mbti: person.mbti,
   };
 }

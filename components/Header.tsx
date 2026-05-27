@@ -9,13 +9,14 @@ const TABS = ["星占", "塔羅", "数秘", "易経", "四柱", "風水", "MBTI"
 interface Props {
   date: string;
   onDateChange: (v: string) => void;
+  rightSlot?: React.ReactNode;
 }
 
 function formatMD(d: Date): string {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-export function Header({ date, onDateChange }: Props) {
+export function Header({ date, onDateChange, rightSlot }: Props) {
   const d = useMemo(() => {
     const [y, m, dd] = date.split("-").map(Number);
     return new Date(Date.UTC(y, m - 1, dd, 12, 0, 0));
@@ -74,6 +75,7 @@ export function Header({ date, onDateChange }: Props) {
         <button className="ml-1 flex items-center gap-2 px-3 py-1.5 border border-neutral-300 rounded-full text-[12px] kanji">
           <span className="w-2 h-2 rounded-full bg-neutral-300 inline-block" /> エディトリアル ▾
         </button>
+        {rightSlot}
       </div>
     </header>
   );

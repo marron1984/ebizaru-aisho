@@ -8,6 +8,7 @@ interface Props {
   center: Profile;
   others: Profile[];
   centerSelf: number;
+  onSelectViewpoint?: (id: string) => void;
 }
 
 // score → ノードのカラートーン
@@ -19,7 +20,7 @@ function toneFor(score: number): { ring: string; fill: string } {
   return { ring: "#6f7d8c", fill: "#cfd6df" };
 }
 
-export function RelationshipMap({ center, others, centerSelf }: Props) {
+export function RelationshipMap({ center, others, centerSelf, onSelectViewpoint }: Props) {
   const W = 720;
   const H = 720;
   const cx = W / 2;
@@ -44,7 +45,10 @@ export function RelationshipMap({ center, others, centerSelf }: Props) {
 
       <div className="flex items-center gap-3 flex-wrap mb-8">
         <span className="editorial-label">Viewpoint 視点</span>
-        <button className="flex items-center gap-2 pl-2 pr-3 py-1 border-2 border-ink rounded-full text-[13px] bg-paper shadow-[0_0_0_2px_rgba(180,160,100,0.35)]">
+        <button
+          onClick={() => onSelectViewpoint?.(center.person.id)}
+          className="flex items-center gap-2 pl-2 pr-3 py-1 border-2 border-ink rounded-full text-[13px] bg-paper shadow-[0_0_0_2px_rgba(180,160,100,0.35)]"
+        >
           <span className="w-1.5 h-1.5 rounded-full bg-sand-400" />
           <span className="kanji font-medium">{center.person.fullName}</span>
           <span className="editorial-label !text-[10px] ml-1">CENTER</span>
@@ -55,7 +59,8 @@ export function RelationshipMap({ center, others, centerSelf }: Props) {
           return (
             <button
               key={p.person.id}
-              className="flex items-center gap-2 pl-2 pr-3 py-1 border border-neutral-300 rounded-full text-[13px] bg-white hover:bg-neutral-50"
+              onClick={() => onSelectViewpoint?.(p.person.id)}
+              className="flex items-center gap-2 pl-2 pr-3 py-1 border border-neutral-300 rounded-full text-[13px] bg-white hover:bg-neutral-50 transition-colors"
             >
               <span className="kanji">{p.person.fullName}</span>
               <span className="num text-neutral-500">{c.overall}</span>
@@ -94,7 +99,12 @@ export function RelationshipMap({ center, others, centerSelf }: Props) {
         {nodes.map((n) => {
           const tone = toneFor(n.score);
           return (
-            <g key={n.profile.person.id} transform={`translate(${n.x}, ${n.y})`}>
+            <g
+              key={n.profile.person.id}
+              transform={`translate(${n.x}, ${n.y})`}
+              className="cursor-pointer"
+              onClick={() => onSelectViewpoint?.(n.profile.person.id)}
+            >
               <circle r={48} fill="none" stroke={tone.ring} strokeWidth={3} />
               <circle r={40} fill={tone.fill} />
               <text textAnchor="middle" y={6} fontSize={22} className="num" fill="#1a1a1a">

@@ -7,4 +7,5 @@ export const OWNER: Person = {
   birth: "1984-05-02",
   gender: "male",
   role: "本人",
+  mbti: "INFJ",
 };

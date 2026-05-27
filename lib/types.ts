@@ -8,6 +8,7 @@ export interface Person {
   birth: string;
   gender?: Gender;
   role?: string;
+  mbti?: import("./mbti").MbtiType;
 }
 
 export type Element = "木" | "火" | "土" | "金" | "水";
