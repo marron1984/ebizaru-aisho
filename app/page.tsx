@@ -41,9 +41,9 @@ export default function Home() {
         rightSlot={
           <Link
             href="/compat"
-            className="px-3 py-1.5 border border-neutral-300 rounded-full text-[12px] kanji bg-white hover:bg-neutral-50"
+            className="px-3 py-1.5 border-2 border-ink rounded-full text-[12px] kanji bg-sun text-ink shadow-patch font-bold hover:-rotate-1 transition-transform shrink-0"
           >
-            任意2人モード →
+            二人モード →
           </Link>
         }
       />

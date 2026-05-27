@@ -13,6 +13,21 @@ function fmt(deg: number): string {
   return `${d}°${String(m).padStart(2, "0")}′`;
 }
 
+function Chip({ label, value, tone = "white" }: { label: string; value: string; tone?: "white" | "yellow" | "red" | "navy" }) {
+  const styles = {
+    white: "bg-white text-ink",
+    yellow: "bg-sun text-ink",
+    red: "bg-ebi-500 text-white",
+    navy: "bg-navy text-cream",
+  }[tone];
+  return (
+    <span className={`${styles} border-2 border-ink shadow-patch rounded-full px-2.5 py-1 inline-flex items-center gap-1.5 shrink-0`}>
+      <span className="text-[9px] kanji font-bold opacity-70 uppercase tracking-widest">{label}</span>
+      <span className="num text-[12px]">{value}</span>
+    </span>
+  );
+}
+
 export function EditorialBand({ date }: Props) {
   const d = useMemo(() => {
     const [y, m, dd] = date.split("-").map(Number);
@@ -26,15 +41,23 @@ export function EditorialBand({ date }: Props) {
   const nd = `${st.nextDate.getMonth() + 1}/${st.nextDate.getDate()}`;
 
   return (
-    <div className="px-4 md:px-8 py-2.5 border-b border-black/8 bg-paper">
-      <div className="flex items-center gap-4 md:gap-6 text-[11px] text-neutral-600 overflow-x-auto no-scrollbar">
-        <span className="editorial-label shrink-0">Astronomy</span>
-        <span className="kanji shrink-0">太陽黄経 <span className="num text-neutral-800">{fmt(sl)}</span></span>
-        <span className="kanji shrink-0">月黄経 <span className="num text-neutral-800">{fmt(ml)}</span></span>
-        <span className="kanji shrink-0">月齢 <span className="num text-neutral-800">{mp.age.toFixed(1)}</span></span>
-        <span className="kanji shrink-0">{mp.name}</span>
-        <span className="text-neutral-300 shrink-0">/</span>
-        <span className="kanji shrink-0">節気 <span className="text-neutral-800">{st.current.name}</span> → <span className="text-neutral-800">{st.next.name}</span> <span className="num text-neutral-500">{nd}</span></span>
+    <div className="border-b-[3px] border-ink bg-ink text-cream relative overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-25 pointer-events-none"
+        style={{
+          backgroundImage: "repeating-linear-gradient(-45deg, transparent 0 8px, rgba(255,210,63,0.4) 8px 9px)",
+        }}
+      />
+      <div className="relative flex items-center gap-2 px-4 md:px-6 py-3 overflow-x-auto no-scrollbar">
+        <span className="display text-cream text-[14px] tracking-wider mr-1 shrink-0">ASTRONOMY //</span>
+        <Chip label="SUN" value={fmt(sl)} tone="yellow" />
+        <Chip label="MOON" value={fmt(ml)} tone="white" />
+        <Chip label="AGE" value={mp.age.toFixed(1)} tone="white" />
+        <span className="text-cream kanji font-bold text-[12px] shrink-0">{mp.name}</span>
+        <span className="text-cream/40 shrink-0">▸</span>
+        <Chip label={st.current.name} value="今" tone="red" />
+        <span className="text-cream/60 text-[11px] shrink-0">→</span>
+        <Chip label={st.next.name} value={nd} tone="navy" />
       </div>
     </div>
   );
